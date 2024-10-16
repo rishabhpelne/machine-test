@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 import {
   formatDate,
   DateSelectArg,
@@ -23,9 +25,12 @@ const Calendar: React.FC = () => {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [newEventTitle, setNewEventTitle] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<DateSelectArg | null>(null);
+  const [activeMenu, setActiveMenu] = useState<string>("calendar");
+  const [activeTab, setActiveTab] = useState('All'); // Set the default active tab
+
+  const tabs = ['All', 'Listening', 'Learning', 'Rehearsal', 'Perform'];
 
   useEffect(() => {
-    // Load events from local storage when the component mounts
     if (typeof window !== "undefined") {
       const savedEvents = localStorage.getItem("events");
       if (savedEvents) {
@@ -35,7 +40,6 @@ const Calendar: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Save events to local storage whenever they change
     if (typeof window !== "undefined") {
       localStorage.setItem("events", JSON.stringify(currentEvents));
     }
@@ -47,7 +51,6 @@ const Calendar: React.FC = () => {
   };
 
   const handleEventClick = (selected: EventClickArg) => {
-    // Prompt user for confirmation before deleting an event
     if (
       window.confirm(
         `Are you sure you want to delete the event "${selected.event.title}"?`
@@ -65,8 +68,8 @@ const Calendar: React.FC = () => {
   const handleAddEvent = (e: React.FormEvent) => {
     e.preventDefault();
     if (newEventTitle && selectedDate) {
-      const calendarApi = selectedDate.view.calendar; // Get the calendar API instance.
-      calendarApi.unselect(); // Unselect the date range.
+      const calendarApi = selectedDate.view.calendar;
+      calendarApi.unselect();
 
       const newEvent = {
         id: `${selectedDate.start.toISOString()}-${newEventTitle}`,
@@ -82,63 +85,183 @@ const Calendar: React.FC = () => {
   };
 
   return (
-    <div>
-      <div className="flex w-full px-10 justify-start items-start gap-8">
-        <div className="w-3/12">
-          <div className="py-10 text-2xl font-extrabold px-7">
-            Calendar Events
+    <div className="flex">
+      {/* Sidebar */}
+      <div className="w-60 h-screen flex flex-col">
+  <ul className="mt-4">
+    <li
+      className={`p-4 cursor-pointer ${
+        activeMenu === "calendar" ? "bg-orange-100" : ""
+      }`}
+      onClick={() => setActiveMenu("calendar")}
+    >
+      <i className="fas fa-calendar-alt mr-2"></i> Home
+    </li>
+    <li
+      className={`p-4 cursor-pointer ${
+        activeMenu === "profile" ? "bg-orange-100" : ""
+      }`}
+      onClick={() => setActiveMenu("profile")}
+    >
+      <i className="fas fa-user mr-2"></i> Profile
+    </li>
+    <li
+      className={`p-4 cursor-pointer ${
+        activeMenu === "library" ? "bg-orange-100" : ""
+      }`}
+      onClick={() => setActiveMenu("library")}
+    >
+      <i className="fas fa-book mr-2"></i> Library
+    </li>
+    <li className="p-4 cursor-pointer">
+      <i className="fas fa-folder mr-2"></i> Collection
+      <ul className="pl-4 mt-2 space-y-2">
+        <li
+          className={`cursor-pointer ${
+            activeMenu === "submenu1" ? "bg-orange-100" : ""
+          }`}
+          onClick={() => setActiveMenu("submenu1")}
+        >
+          <i className="fas fa-music mr-2"></i> Playlists
+        </li>
+        <li
+          className={`cursor-pointer ${
+            activeMenu === "submenu2" ? "bg-orange-100" : ""
+          }`}
+          onClick={() => setActiveMenu("submenu2")}
+        >
+          <i className="fas fa-microphone-alt mr-2"></i> Tracks
+        </li>
+        <li
+          className={`cursor-pointer ${
+            activeMenu === "submenu3" ? "bg-orange-100" : ""
+          }`}
+          onClick={() => setActiveMenu("submenu3")}
+        >
+          <i className="fas fa-user-friends mr-2"></i> Artists
+        </li>
+        <li
+          className={`cursor-pointer ${
+            activeMenu === "submenu4" ? "bg-orange-100" : ""
+          }`}
+          onClick={() => setActiveMenu("submenu4")}
+        >
+          <i className="fas fa-record-vinyl mr-2"></i> Albums
+        </li>
+        <li
+          className={`cursor-pointer ${
+            activeMenu === "submenu5" ? "bg-orange-100" : ""
+          }`}
+          onClick={() => setActiveMenu("submenu5")}
+        >
+          <i className="fas fa-list mr-2"></i> Genres
+        </li>
+        <li
+          className={`cursor-pointer ${
+            activeMenu === "submenu6" ? "bg-orange-100" : ""
+          }`}
+          onClick={() => setActiveMenu("submenu6")}
+        >
+          <i className="fas fa-calendar-alt mr-2"></i> Decades
+        </li>
+        <li
+          className={`cursor-pointer ${
+            activeMenu === "submenu7" ? "bg-orange-100" : ""
+          }`}
+          onClick={() => setActiveMenu("submenu7")}
+        >
+          <i className="fas fa-globe mr-2"></i> Geos
+        </li>
+      </ul>
+    </li>
+    <li
+      className={`p-4 cursor-pointer ${
+        activeMenu === "community" ? "bg-orange-100" : ""
+      }`}
+      onClick={() => setActiveMenu("community")}
+    >
+      <i className="fas fa-users mr-2"></i> Community
+    </li>
+  </ul>
+</div>
+
+
+      {/* Main Content */}
+      <div className="w-full">
+        {/* Top Navbar */}
+        <div className="p-4 flex justify-between items-center mt-5 mx-5">
+      <ul className="flex space-x-12">
+        {tabs.map((tab) => (
+          <li
+            key={tab}
+            className={`cursor-pointer p-1 px-3 ${
+              activeTab === tab ? 'bg-orange-300 text-white' : ''
+            }`}
+            onClick={() => setActiveTab(tab)} // Set active tab on click
+          >
+            {tab}
+          </li>
+        ))}
+      </ul>
+    </div>
+
+        {/* Calendar and Events */}
+        <div className="p-8 box-shadow">
+          <div className="flex">
+            <div className="w-3/12">
+              <div className="py-10 text-2xl font-extrabold">Calendar Events</div>
+              <ul className="space-y-4">
+                {currentEvents.length <= 0 && (
+                  <div className="italic text-center text-gray-400">
+                    No Events Present
+                  </div>
+                )}
+
+                {currentEvents.length > 0 &&
+                  currentEvents.map((event: EventApi) => (
+                    <li
+                      className="border border-gray-200 shadow px-4 py-2 rounded-md text-blue-800"
+                      key={event.id}
+                    >
+                      s
+                      <br />
+                      <label className="text-slate-950">
+                        {formatDate(event.start!, {
+                          year: "numeric",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </label>
+                    </li>
+                  ))}
+              </ul>
+            </div>
+
+            <div className="w-9/12">
+              <FullCalendar
+                height={"85vh"}
+                plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+                headerToolbar={{
+                  left: "prev,next today",
+                  center: "title",
+                  right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
+                }}
+                initialView="dayGridMonth"
+                editable={true}
+                selectable={true}
+                selectMirror={true}
+                dayMaxEvents={true}
+                select={handleDateClick}
+                eventClick={handleEventClick}
+                eventsSet={(events) => setCurrentEvents(events)}
+                initialEvents={
+                  typeof window !== "undefined"
+                    ? JSON.parse(localStorage.getItem("events") || "[]")
+                    : []
+                }
+              />
+            </div>
           </div>
-          <ul className="space-y-4">
-            {currentEvents.length <= 0 && (
-              <div className="italic text-center text-gray-400">
-                No Events Present
-              </div>
-            )}
-
-            {currentEvents.length > 0 &&
-              currentEvents.map((event: EventApi) => (
-                <li
-                  className="border border-gray-200 shadow px-4 py-2 rounded-md text-blue-800"
-                  key={event.id}
-                >
-                  {event.title}
-                  <br />
-                  <label className="text-slate-950">
-                    {formatDate(event.start!, {
-                      year: "numeric",
-                      month: "short",
-                      day: "numeric",
-                    })}{" "}
-                    {/* Format event start date */}
-                  </label>
-                </li>
-              ))}
-          </ul>
-        </div>
-
-        <div className="w-9/12 mt-8">
-          <FullCalendar
-            height={"85vh"}
-            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]} // Initialize calendar with required plugins.
-            headerToolbar={{
-              left: "prev,next today",
-              center: "title",
-              right: "dayGridMonth,timeGridWeek,timeGridDay,listWeek",
-            }} // Set header toolbar options.
-            initialView="dayGridMonth" // Initial view mode of the calendar.
-            editable={true} // Allow events to be edited.
-            selectable={true} // Allow dates to be selectable.
-            selectMirror={true} // Mirror selections visually.
-            dayMaxEvents={true} // Limit the number of events displayed per day.
-            select={handleDateClick} // Handle date selection to create new events.
-            eventClick={handleEventClick} // Handle clicking on events (e.g., to delete them).
-            eventsSet={(events) => setCurrentEvents(events)} // Update state with current events whenever they change.
-            initialEvents={
-              typeof window !== "undefined"
-                ? JSON.parse(localStorage.getItem("events") || "[]")
-                : []
-            } // Initial events loaded from local storage.
-          />
         </div>
       </div>
 
@@ -153,17 +276,16 @@ const Calendar: React.FC = () => {
               type="text"
               placeholder="Event Title"
               value={newEventTitle}
-              onChange={(e) => setNewEventTitle(e.target.value)} // Update new event title as the user types.
+              onChange={(e) => setNewEventTitle(e.target.value)}
               required
               className="border border-gray-200 p-3 rounded-md text-lg"
             />
             <button
-              className="bg-green-500 text-white p-3 mt-5 rounded-md"
+              className="bg-orange-300 text-white p-3 mt-5 rounded-md"
               type="submit"
             >
               Add
-            </button>{" "}
-            {/* Button to submit new event */}
+            </button>
           </form>
         </DialogContent>
       </Dialog>
@@ -171,4 +293,4 @@ const Calendar: React.FC = () => {
   );
 };
 
-export default Calendar; // Export the Calendar component for use in other parts of the application.
+export default Calendar;

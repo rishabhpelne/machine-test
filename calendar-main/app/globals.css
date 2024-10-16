@@ -67,3 +67,10 @@
     @apply bg-background text-foreground;
   }
 }
+
+.fc .fc-button-primary {
+  background-color: rgba(255, 166, 0, 0.692) !important;
+}
+.box-shadow {
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+}
