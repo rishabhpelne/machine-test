@@ -2,6 +2,8 @@
 
 import React, { useState, useEffect } from "react";
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import Calendars from 'react-calendar';
+import 'react-calendar/dist/Calendar.css'; 
 
 import {
   formatDate,
@@ -26,7 +28,12 @@ const Calendar: React.FC = () => {
   const [newEventTitle, setNewEventTitle] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<DateSelectArg | null>(null);
   const [activeMenu, setActiveMenu] = useState<string>("calendar");
-  const [activeTab, setActiveTab] = useState('All'); // Set the default active tab
+  const [activeTab, setActiveTab] = useState('All');
+  const [value, setValue] = useState(new Date());
+
+  const onChange = (nextValue) => {
+    setValue(nextValue);
+  };
 
   const tabs = ['All', 'Listening', 'Learning', 'Rehearsal', 'Perform'];
 
@@ -208,34 +215,6 @@ const Calendar: React.FC = () => {
         {/* Calendar and Events */}
         <div className="p-8 box-shadow">
           <div className="flex">
-            <div className="w-3/12">
-              <div className="py-10 text-2xl font-extrabold">Calendar Events</div>
-              <ul className="space-y-4">
-                {currentEvents.length <= 0 && (
-                  <div className="italic text-center text-gray-400">
-                    No Events Present
-                  </div>
-                )}
-
-                {currentEvents.length > 0 &&
-                  currentEvents.map((event: EventApi) => (
-                    <li
-                      className="border border-gray-200 shadow px-4 py-2 rounded-md text-blue-800"
-                      key={event.id}
-                    >
-                      s
-                      <br />
-                      <label className="text-slate-950">
-                        {formatDate(event.start!, {
-                          year: "numeric",
-                          month: "short",
-                          day: "numeric",
-                        })}
-                      </label>
-                    </li>
-                  ))}
-              </ul>
-            </div>
 
             <div className="w-9/12">
               <FullCalendar
@@ -261,6 +240,14 @@ const Calendar: React.FC = () => {
                 }
               />
             </div>
+
+            <div className="w-3/12 p-4 pt-0 bg-white shadow-lg rounded-lg">
+      <Calendars 
+        onChange={onChange}
+        value={value}
+        className="mx-auto"
+      />
+    </div>
           </div>
         </div>
       </div>
